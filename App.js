@@ -25,6 +25,8 @@ import {
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
 
+import Tts from 'react-native-tts';
+
 export default class App extends React.Component {
   constructor(props) {
     super(props);
@@ -36,6 +38,7 @@ export default class App extends React.Component {
 
   componentDidMount() {
     this.fetchLott();
+    Tts.speak('Hello, world!');
   }
   fetchLott = () => {
     const productIds = ['OzLotto', 'MonWedLotto', 'Powerball'];
