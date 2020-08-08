@@ -24,6 +24,8 @@ import {
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
 
+import LotteryList from './components/lottery-list';
+
 const App: () => React$Node = () => {
   return (
     <>
@@ -32,6 +34,7 @@ const App: () => React$Node = () => {
         <ScrollView
           contentInsetAdjustmentBehavior="automatic"
           style={styles.scrollView}>
+          <LotteryList />
           <Header />
           {global.HermesInternal == null ? null : (
             <View style={styles.engine}>
