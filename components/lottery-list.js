@@ -1,5 +1,5 @@
 import React from 'react';
-import {Text, Image, StyleSheet} from 'react-native';
+import {Text, Image, StyleSheet, View} from 'react-native';
 
 import {Colors} from 'react-native/Libraries/NewAppScreen';
 
@@ -46,13 +46,13 @@ export default class LotteryList extends React.Component {
       });
   };
   render() {
-    console.log(this.state.DrawResults[0]);
+    // console.log(this.state.DrawResults[0]);
 
     return (
-      <>
+      <View key="draw-result">
         {this.state.DrawResults.map((DrawResult) => (
-          <>
-            <Text>{DrawResult.ProductId}</Text>
+          <View key={DrawResult.ProductId}>
+            <Text testID={'text'}>{DrawResult.ProductId}</Text>
             <Text>{DrawResult.DrawLogoUrl}</Text>
             <Text>{DrawResult.DrawDate}</Text>
             <Text>{DrawResult.DrawNumber}</Text>
@@ -60,13 +60,12 @@ export default class LotteryList extends React.Component {
             <Image
               style={styles.logo}
               source={{
-                uri:
-                  'http://media.tatts.com/TattsServices/Lotto/Products/Powerball_v1.png',
+                uri: DrawResult.DrawLogoUrl,
               }}
             />
-          </>
+          </View>
         ))}
-      </>
+      </View>
     );
   }
 }
