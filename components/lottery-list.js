@@ -1,114 +1,95 @@
-import React from 'react';
-import {Text, Image, StyleSheet, View} from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {Text, Image, FlatList, StyleSheet, View, Button} from 'react-native';
 
-import {Colors} from 'react-native/Libraries/NewAppScreen';
+import Moment from 'moment';
 
 import Tts from 'react-native-tts';
 
-export default class LotteryList extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      isFetching: false,
-      DrawResults: [],
-    };
-  }
+const LotteryList = () => {
+  const [DrawResultslts, setDrawResultslts] = useState([]);
+  const Separator = () => <View style={styles.separator} />;
 
-  componentDidMount() {
-    this.fetchLott();
-    Tts.speak('Hello, world!');
-  }
-  fetchLott = () => {
-    const productIds = ['OzLotto', 'MonWedLotto', 'Powerball'];
-
-    return fetch(
-      'https://data.api.thelott.com/sales/vmax/web/data/lotto/latestresults',
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+  useEffect(() => {
+    const getUsers = async () => {
+      const productIds = ['OzLotto', 'MonWedLotto', 'Powerball'];
+      const response = await fetch(
+        'https://data.api.thelott.com/sales/vmax/web/data/lotto/latestresults',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            CompanyId: 'Tattersalls',
+            MaxDrawCountPerProduct: 1,
+            OptionalProductFilter: productIds,
+          }),
         },
-        body: JSON.stringify({
-          CompanyId: 'Tattersalls',
-          MaxDrawCountPerProduct: 1,
-          OptionalProductFilter: productIds,
-        }),
-      },
-    )
-      .then((response) => response.json())
-      .then((data) => {
-        // console.log('Success:', data);
-        this.setState({DrawResults: data.DrawResults});
-        // console.log(this.state.DrawResults);
-      })
-      .catch((error) => {
-        // console.error('Error:', error);
-      });
-  };
-  render() {
-    // console.log(this.state.DrawResults[0]);
+      );
+      const data = await response.json();
+      setDrawResultslts(
+        data.DrawResults.map((DrawResult) => ({
+          id: DrawResult.ProductId,
+          name: 'Lottery Name: ' + `${DrawResult.ProductId}`,
+          DrawLogoUrl: DrawResult.DrawLogoUrl,
+          DrawDate:
+            'Lottery DrawDate: ' +
+            `${Moment(DrawResult.DrawDate).format('d MMM')}`,
+          DrawNumber: 'Lottery DrawNumber: ' + `${DrawResult.DrawNumber}`,
+          Dividend:
+            'First Dividend Amount: ' +
+            `${DrawResult.Dividends[0].BlocDividend}`,
+        })),
+      );
+    };
 
-    return (
-      <View key="draw-result">
-        {this.state.DrawResults.map((DrawResult) => (
-          <View key={DrawResult.ProductId}>
-            <Text testID={'text'}>{DrawResult.ProductId}</Text>
-            <Text>{DrawResult.DrawLogoUrl}</Text>
-            <Text>{DrawResult.DrawDate}</Text>
-            <Text>{DrawResult.DrawNumber}</Text>
-            <Text>{DrawResult.Dividends[0].BlocDividend}</Text>
+    getUsers();
+  }, []);
+  const ReadWinnerNumber = (num) => {
+    Tts.speak(num);
+  };
+  return (
+    <View style={styles.container}>
+      <FlatList
+        data={DrawResultslts}
+        renderItem={({item}) => (
+          <View style={styles.item}>
+            <Text>{item.name}</Text>
+            <Text>{item.DrawDate}</Text>
+            <Text>{item.DrawNumber}</Text>
+            <Text>{item.Dividend}</Text>
             <Image
               style={styles.logo}
               source={{
-                uri: DrawResult.DrawLogoUrl,
+                uri: item.DrawLogoUrl,
               }}
             />
+            <Button
+              onPress={() => ReadWinnerNumber(item.DrawNumber)}
+              title="Press to Read Winner Number"
+            />
+            <Separator />
           </View>
-        ))}
-      </View>
-    );
-  }
-}
+        )}
+      />
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
-  scrollView: {
-    backgroundColor: Colors.lighter,
+  container: {
+    flex: 1,
+    padding: 22,
+    justifyContent: 'center',
   },
-  engine: {
-    position: 'absolute',
-    right: 0,
-  },
-  body: {
-    backgroundColor: Colors.white,
-  },
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: Colors.black,
-  },
-  sectionDescription: {
-    marginTop: 8,
+  item: {
+    padding: 20,
     fontSize: 18,
-    fontWeight: '400',
-    color: Colors.dark,
   },
-  highlight: {
-    fontWeight: '700',
-  },
-  footer: {
-    color: Colors.dark,
-    fontSize: 12,
-    fontWeight: '600',
-    padding: 4,
-    paddingRight: 12,
-    textAlign: 'right',
-  },
-  logo: {
-    width: 66,
-    height: 58,
+  separator: {
+    marginVertical: 8,
+    borderBottomColor: '#737373',
+    borderBottomWidth: StyleSheet.hairlineWidth,
   },
 });
+export default LotteryList;
