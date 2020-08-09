@@ -66,7 +66,7 @@ const LotteryList = () => {
             />
             <Button
               onPress={() => ReadWinnerNumber(item.DrawNumber)}
-              title="Press to Read Winner Number"
+              title="Press to Read Draw Number"
             />
             <Separator />
           </View>
